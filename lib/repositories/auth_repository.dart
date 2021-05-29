@@ -27,7 +27,7 @@ class AuthRepository implements BaseAuthRepository {
     try {
       return _read(firebaseAuthProvider).currentUser;
     } on FirebaseAuthException catch (e) {
-      throw CustomException(message: e.message);
+      throw CustomException(message: e.message.toString());
     }
   }
 
@@ -36,7 +36,7 @@ class AuthRepository implements BaseAuthRepository {
     try {
       await _read(firebaseAuthProvider).signInAnonymously();
     } on FirebaseAuthException catch (e) {
-      throw CustomException(message: e.message);
+      throw CustomException(message: e.message.toString());
     }
   }
 
@@ -46,7 +46,7 @@ class AuthRepository implements BaseAuthRepository {
       await _read(firebaseAuthProvider).signOut();
       await signInAnonymously();
     } on FirebaseAuthException catch (e) {
-      throw CustomException(message: e.message);
+      throw CustomException(message: e.message.toString());
     }
   }
 }

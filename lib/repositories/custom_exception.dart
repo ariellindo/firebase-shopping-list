@@ -1,7 +1,7 @@
 class CustomException {
-  final String? message;
+  late final String message;
 
-  const CustomException({
+  CustomException({
     this.message = 'Something went wrong!',
   });
 

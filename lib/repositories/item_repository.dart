@@ -26,21 +26,18 @@ class ItemRepository implements BaseItemRepository {
           .add(item.toDocument());
       return docRef.id;
     } on FirebaseException catch (e) {
-      throw CustomException(message: e.message);
+      throw CustomException(message: e.message.toString());
     }
   }
 
   @override
   Future<List<Item>> retrieveItems({required String userId}) async {
     try {
-      final snap = await _read(firebaseFirestoreProvider)
-          .collection('lists')
-          .doc(userId)
-          .collection('userList')
-          .get();
+      final snap =
+          await _read(firebaseFirestoreProvider).usersListRef(userId).get();
       return snap.docs.map((doc) => Item.fromDocument(doc)).toList();
     } on FirebaseException catch (e) {
-      throw CustomException(message: e.message);
+      throw CustomException(message: e.message.toString());
     }
   }
 
@@ -48,13 +45,11 @@ class ItemRepository implements BaseItemRepository {
   Future<void> updateItem({required String userId, required Item item}) async {
     try {
       await _read(firebaseFirestoreProvider)
-          .collection('lists')
-          .doc(userId)
-          .collection('userLists')
+          .usersListRef(userId)
           .doc(item.id)
           .update(item.toDocument());
     } on FirebaseException catch (e) {
-      throw CustomException(message: e.message);
+      throw CustomException(message: e.message.toString());
     }
   }
 
@@ -62,14 +57,9 @@ class ItemRepository implements BaseItemRepository {
   Future<void> deleteItem(
       {required String userId, required String itemId}) async {
     try {
-      await _read(firebaseFirestoreProvider)
-          .collection('lists')
-          .doc(userId)
-          .collection('lists')
-          .doc(itemId)
-          .delete();
+      await _read(firebaseFirestoreProvider).usersListRef(userId).doc(itemId).delete();
     } on FirebaseException catch (e) {
-      throw CustomException(message: e.message);
+      throw CustomException(message: e.message.toString());
     }
   }
 }
