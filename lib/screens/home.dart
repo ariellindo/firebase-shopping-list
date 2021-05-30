@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:prod_app/controllers/auth_controller.dart';
+import 'package:prod_app/models/item_model.dart';
+import 'package:prod_app/widgets/add_item_dialog.dart';
 
 class HomeScreen extends HookWidget {
   @override
@@ -15,11 +17,15 @@ class HomeScreen extends HookWidget {
         leading: authControllerState != null
             ? IconButton(
                 icon: const Icon(Icons.logout),
-                onPressed: () => context.read(authControllerProvider.notifier).signOut(),
+                onPressed: () =>
+                    context.read(authControllerProvider.notifier).signOut(),
               )
             : null,
       ),
-      body: Container(),
+      floatingActionButton: FloatingActionButton(
+        onPressed: () => AddItemDialog.show(context, Item.empty()),
+        child: const Icon(Icons.add),
+      ),
     );
   }
 }
