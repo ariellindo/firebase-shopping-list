@@ -1,7 +1,11 @@
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:prod_app/controllers/auth_controller.dart';
 import 'package:prod_app/models/item_model.dart';
+import 'package:prod_app/repositories/custom_exception.dart';
+import 'package:prod_app/repositories/item_repository.dart';
 
+// notifying the user in a light weight manner that an error occured
+final itemListExceptionProvider = StateProvider<CustomException?>((_) => null);
 
 final itemListControllerProvider =
     StateNotifierProvider<ItemListController, AsyncValue<List<Item>>>(
@@ -15,5 +19,64 @@ class ItemListController extends StateNotifier<AsyncValue<List<Item>>> {
   final Reader _read;
   final String? _userId;
 
-  ItemListController(this._read, this._userId) : super(AsyncValue.loading());
+  ItemListController(this._read, this._userId) : super(AsyncValue.loading()) {
+    if(_userId != null) {
+      retrieveItems();
+    }
+  }
+
+  Future<void> retrieveItems({bool isRefreshing = false}) async {
+    if (isRefreshing) state = AsyncValue.loading();
+
+    try {
+      final items =
+          await _read(itemRepositoryProvider).retrieveItems(userId: _userId!);
+      if (mounted) {
+        state = AsyncValue.data(items);
+      }
+    } on CustomException catch (e, st) {
+      state = AsyncValue.error(e, st);
+    }
+  }
+
+  Future<void> addItem({required String name, bool obtained = false}) async {
+    try {
+      final item = Item(name: name, obtained: obtained);
+      final itemId = await _read(itemRepositoryProvider)
+          .createItems(userId: _userId!, item: item);
+
+      state.whenData((items) =>
+          state = AsyncValue.data(items..add(item.copyWith(id: itemId))));
+    } on CustomException catch (e) {
+      _read(itemListExceptionProvider).state = e;
+    }
+  }
+
+  Future<void> updateItem({required Item updatedItem}) async {
+    try {
+      await _read(itemRepositoryProvider)
+          .updateItem(userId: _userId!, item: updatedItem);
+
+      state.whenData((items) {
+        state = AsyncValue.data([
+          for (final item in items)
+            item.id == updatedItem.id ? updatedItem : item
+        ]);
+      });
+    } on CustomException catch (e) {
+      _read(itemListExceptionProvider).state = e;
+    }
+  }
+
+  Future<void> deleteItem({required String itemId}) async {
+    try {
+      await _read(itemRepositoryProvider)
+          .deleteItem(userId: _userId!, itemId: itemId);
+
+      state.whenData((items) => state =
+          AsyncValue.data(items..removeWhere((item) => item.id == itemId)));
+    } on CustomException catch (e) {
+      _read(itemListExceptionProvider).state = e;
+    }
+  }
 }

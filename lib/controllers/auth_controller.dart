@@ -5,6 +5,7 @@ import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:prod_app/repositories/auth_repository.dart';
 
 // on app started the user will be logged int anonymously
+// this controller is set to a provider to be called on app load
 final authControllerProvider = StateNotifierProvider<AuthController, User?>(
     (ref) => AuthController(ref.read)..appStarted(),);
 
