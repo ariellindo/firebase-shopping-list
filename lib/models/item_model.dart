@@ -29,5 +29,5 @@ abstract class Item implements _$Item {
     return Item.fromJson(data).copyWith(id: doc.id);
   }
 
-  Map<String, dynamic> toDocument() => toJson()..remove('id');
+  Map<String, dynamic> toDocument() => toJson()..remove("id");
 }

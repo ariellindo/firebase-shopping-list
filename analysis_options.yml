@@ -1,4 +1,4 @@
 analyzer:
   exclude:
-    - '**/*.g.dart'
-    - '**/*.freezed.dart'
+    - "**/*.g.dart"
+    - "**/*.freezed.dart"
