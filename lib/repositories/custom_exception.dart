@@ -1,12 +1,10 @@
 class CustomException {
-  String message = '';
+  final String? message;
 
   CustomException({
     this.message = 'Something went wrong!',
   });
 
   @override
-  toString() {
-    return 'CustomException { message: $message }';
-  }
+  String toString() => 'CustomException { message: $message }';
 }

@@ -34,25 +34,31 @@ class AddItemDialog extends HookWidget {
               autofocus: true,
               decoration: const InputDecoration(hintText: 'Item name'),
             ),
-            const SizedBox(height: 12.0),
-            ElevatedButton(
-              style: ElevatedButton.styleFrom(
-                primary:
-                    isUpdating ? Colors.orange : Theme.of(context).primaryColor,
+            const SizedBox(height: 20.0),
+            SizedBox(
+              width: double.infinity,
+              child: ElevatedButton(
+                style: ElevatedButton.styleFrom(
+                  primary: isUpdating
+                      ? Colors.orange
+                      : Theme.of(context).primaryColor,
+                ),
+                onPressed: () {
+                  isUpdating
+                      ? context
+                          .read(itemListControllerProvider.notifier)
+                          .updateItem(
+                            updatedItem: item.copyWith(
+                                name: textController.text.trim(),
+                                obtained: item.obtained),
+                          )
+                      : context
+                          .read(itemListControllerProvider.notifier)
+                          .addItem(name: textController.text.trim());
+                  Navigator.of(context).pop();
+                },
+                child: Text(isUpdating ? 'Update' : 'Add'),
               ),
-              onPressed: () {
-                isUpdating
-                    ? context.read(itemListControllerProvider.notifier).updateItem(
-                          updatedItem: item.copyWith(
-                              name: textController.text.trim(),
-                              obtained: item.obtained),
-                        )
-                    : context
-                        .read(itemListControllerProvider.notifier)
-                        .addItem(name: textController.text.trim());
-                Navigator.of(context).pop();
-              },
-              child: Text(isUpdating ? 'Update' : 'Add'),
             )
           ],
         ),
