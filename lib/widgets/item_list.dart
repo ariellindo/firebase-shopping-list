@@ -4,6 +4,7 @@ import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:prod_app/controllers/item_list_controller.dart';
 import 'package:prod_app/models/item_model.dart';
 import 'package:prod_app/repositories/custom_exception.dart';
+import 'package:prod_app/widgets/add_item_dialog.dart';
 import 'package:prod_app/widgets/item_list_error.dart';
 
 class ItemList extends HookWidget {
@@ -53,6 +54,10 @@ class ItemTile extends StatelessWidget {
             .read(itemListControllerProvider.notifier)
             .updateItem(updatedItem: item.copyWith(obtained: !item.obtained)),
       ),
+      onTap: () => AddItemDialog.show(context, item),
+      onLongPress: () => context
+          .read(itemListControllerProvider.notifier)
+          .deleteItem(itemId: item.id!),
     );
   }
 }
