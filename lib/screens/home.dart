@@ -13,6 +13,8 @@ class HomeScreen extends HookWidget {
   Widget build(BuildContext context) {
     // trigger the appStarted() function so the user is always logged in
     final authControllerState = useProvider(authControllerProvider);
+    final itemListFilter = useProvider(itemListFilterProvider);
+    final isObtainedFilter = itemListFilter.state == ItemListFilter.obtained;
 
     return Scaffold(
       appBar: AppBar(
@@ -24,6 +26,17 @@ class HomeScreen extends HookWidget {
                     context.read(authControllerProvider.notifier).signOut(),
               )
             : null,
+        actions: [
+          IconButton(
+            onPressed: () => itemListFilter.state =
+                isObtainedFilter ? ItemListFilter.all : ItemListFilter.obtained,
+            icon: Icon(
+              isObtainedFilter
+                  ? Icons.check_circle
+                  : Icons.check_circle_outline,
+            ),
+          ),
+        ],
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () => AddItemDialog.show(context, Item.empty()),

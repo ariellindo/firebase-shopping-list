@@ -13,6 +13,8 @@ class ItemList extends HookWidget {
   @override
   Widget build(BuildContext context) {
     final itemListState = useProvider(itemListControllerProvider);
+    final filteredItemList = useProvider(filteredItemListProvider);
+
     return itemListState.when(
       data: (items) => items.isEmpty
           ? const Center(
@@ -21,10 +23,13 @@ class ItemList extends HookWidget {
               style: TextStyle(fontSize: 20.0),
             ))
           : ListView.builder(
-              itemCount: items.length,
+              itemCount: filteredItemList.length,
               itemBuilder: (BuildContext context, int index) {
-                final item = items[index];
-                return ItemTile(item: item);
+                final item = filteredItemList[index];
+                return ProviderScope(
+                  overrides: [currentItem.overrideWithValue(item)],
+                  child: const ItemTile(),
+                );
               }),
       loading: () => const Center(child: CircularProgressIndicator()),
       error: (error, _) => ItemListError(
@@ -35,16 +40,14 @@ class ItemList extends HookWidget {
   }
 }
 
-class ItemTile extends StatelessWidget {
-  const ItemTile({
-    Key? key,
-    required this.item,
-  }) : super(key: key);
+final currentItem = ScopedProvider<Item>((_) => throw UnimplementedError());
 
-  final Item item;
+class ItemTile extends HookWidget {
+  const ItemTile({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
+    final item = useProvider(currentItem);
     return ListTile(
       key: ValueKey(item.id),
       title: Text(item.name),

@@ -4,9 +4,37 @@ import 'package:prod_app/models/item_model.dart';
 import 'package:prod_app/repositories/custom_exception.dart';
 import 'package:prod_app/repositories/item_repository.dart';
 
+enum ItemListFilter {
+  all,
+  obtained,
+}
+
+// provider for the on/off state for the action button on the App Bar
+final itemListFilterProvider =
+    StateProvider<ItemListFilter>((_) => ItemListFilter.all);
+
+// the filter is activated according to the above provider state
+final filteredItemListProvider = Provider<List<Item>>((ref) {
+  final itemListFilterState = ref.watch(itemListFilterProvider).state;
+  final itemListState = ref.watch(itemListControllerProvider);
+
+  return itemListState.maybeWhen(
+    data: (items) {
+      switch (itemListFilterState) {
+        case ItemListFilter.obtained:
+          return items.where((item) => item.obtained).toList();
+        default:
+          return items;
+      }
+    },
+    orElse: () => [],
+  );
+});
+
 // notifying the user in a light weight manner that an error occured
 final itemListExceptionProvider = StateProvider<CustomException?>((_) => null);
 
+// saves the Item List CRUD services to a state notifier Provider
 final itemListControllerProvider =
     StateNotifierProvider<ItemListController, AsyncValue<List<Item>>>(
   (ref) {
@@ -20,7 +48,7 @@ class ItemListController extends StateNotifier<AsyncValue<List<Item>>> {
   final String? _userId;
 
   ItemListController(this._read, this._userId) : super(AsyncValue.loading()) {
-    if(_userId != null) {
+    if (_userId != null) {
       retrieveItems();
     }
   }
